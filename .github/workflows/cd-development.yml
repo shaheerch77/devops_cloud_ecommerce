@@ -1,0 +1,50 @@
+name: CD - Development
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy-development:
+    name: Build & Push (dev tag)
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build & Push - User Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service:dev ./src/user-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/user-service:dev
+
+      - name: Build & Push - Product Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/product-service:dev ./src/product-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/product-service:dev
+
+      - name: Build & Push - Order Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/order-service:dev ./src/order-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/order-service:dev
+
+      - name: Build & Push - Notification Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/notification-service:dev ./src/notification-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/notification-service:dev
+
+      - name: Deployment Summary
+        run: |
+          echo "🚀 Development deployment complete!"
+          echo "Images pushed with :dev tag"
+          echo "User Service:         ${{ secrets.DOCKER_USERNAME }}/user-service:dev"
+          echo "Product Service:      ${{ secrets.DOCKER_USERNAME }}/product-service:dev"
+          echo "Order Service:        ${{ secrets.DOCKER_USERNAME }}/order-service:dev"
+          echo "Notification Service: ${{ secrets.DOCKER_USERNAME }}/notification-service:dev"

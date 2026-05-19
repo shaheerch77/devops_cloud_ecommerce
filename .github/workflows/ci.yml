@@ -1,0 +1,60 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop, staging, main]
+
+jobs:
+  lint-and-build:
+    name: Lint & Docker Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install & Test - User Service
+        working-directory: src/user-service
+        run: |
+          npm install
+          npm test
+
+      - name: Install & Test - Product Service
+        working-directory: src/product-service
+        run: |
+          npm install
+          npm test
+
+      - name: Install & Test - Order Service
+        working-directory: src/order-service
+        run: |
+          npm install
+          npm test
+
+      - name: Install & Test - Notification Service
+        working-directory: src/notification-service
+        run: |
+          npm install
+          npm test
+
+      - name: Docker Build Check - User Service
+        run: docker build -t user-service:ci ./src/user-service
+
+      - name: Docker Build Check - Product Service
+        run: docker build -t product-service:ci ./src/product-service
+
+      - name: Docker Build Check - Order Service
+        run: docker build -t order-service:ci ./src/order-service
+
+      - name: Docker Build Check - Notification Service
+        run: docker build -t notification-service:ci ./src/notification-service
+
+      - name: CI Complete
+        run: echo "✅ All services built and tested successfully!"
