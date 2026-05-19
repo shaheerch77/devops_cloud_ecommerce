@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopCloud — Notifications</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">Shop<span>Cloud</span></a>
+    <ul class="nav-links">
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="orders.html">Orders</a></li>
+        <li><a href="notifications.html" class="active">Notifications <span id="badge" style="background:#ef4444;color:#fff;border-radius:999px;padding:.1rem .45rem;font-size:.7rem;margin-left:.25rem;"></span></a></li>
+        <li><a href="login.html">Login</a></li>
+    </ul>
+</nav>
+
+<div class="hero" style="padding:2.5rem 2rem;">
+    <h1>Notification Center</h1>
+    <p>In-app notifications for order events and system alerts</p>
+</div>
+
+<div class="container">
+
+    <!-- Stats -->
+    <div class="grid-3" style="margin-bottom:1.75rem;">
+        <div class="stat-card" style="border-left-color:#2563eb;"><div class="stat-label">Total</div><div class="stat-value" id="total-count">0</div></div>
+        <div class="stat-card" style="border-left-color:#dc2626;"><div class="stat-label">Unread</div><div class="stat-value" id="unread-count">0</div></div>
+        <div class="stat-card" style="border-left-color:#16a34a;"><div class="stat-label">Read</div><div class="stat-value" id="read-count">0</div></div>
+    </div>
+
+    <div class="grid-2">
+
+        <!-- Notification List -->
+        <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <strong>Notifications</strong>
+                <div style="display:flex; gap:.5rem;">
+                    <button class="btn btn-outline btn-sm" onclick="markAllRead()">✓ Mark All Read</button>
+                    <button class="btn btn-outline btn-sm" onclick="clearAll()">🗑 Clear All</button>
+                </div>
+            </div>
+            <div id="notif-list"></div>
+        </div>
+
+        <!-- Send Notification Form -->
+        <div>
+            <div class="card">
+                <h2>📤 Send Notification</h2>
+                <div id="send-msg"></div>
+                <div class="form-group">
+                    <label>User ID</label>
+                    <input type="text" id="n-user" placeholder="e.g. user123" value="user123" />
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="n-type">
+                        <option value="order_confirmed">Order Confirmed</option>
+                        <option value="order_shipped">Order Shipped</option>
+                        <option value="order_delivered">Order Delivered</option>
+                        <option value="order_cancelled">Order Cancelled</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="n-title" placeholder="Notification title" />
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="n-msg" rows="3" placeholder="Notification message..."></textarea>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="sendNotification()">Send Notification</button>
+            </div>
+
+            <div class="card" style="margin-top:1.25rem;">
+                <h2>🔗 Notification Service API</h2>
+                <table>
+                    <thead><tr><th>Method</th><th>Endpoint</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="badge badge-success">POST</span></td><td><code>/api/notifications</code></td></tr>
+                        <tr><td><span class="badge badge-info">GET</span></td><td><code>/api/notifications/user/:id</code></td></tr>
+                        <tr><td><span class="badge badge-info">GET</span></td><td><code>/api/notifications/user/:id/unread</code></td></tr>
+                        <tr><td><span class="badge badge-warning">PUT</span></td><td><code>/api/notifications/:id/read</code></td></tr>
+                        <tr><td><span class="badge badge-danger">DELETE</span></td><td><code>/api/notifications/:id</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>&copy; 2024 <strong>ShopCloud</strong> — DevOps Cloud Computing Final Project</footer>
+
+<script>
+const TYPE_META = {
+    order_confirmed: { icon: '✅', cls: 'success' },
+    order_shipped:   { icon: '🚚', cls: 'info' },
+    order_delivered: { icon: '📦', cls: 'success' },
+    order_cancelled: { icon: '❌', cls: 'danger' },
+    general:         { icon: '🔔', cls: 'warning' },
+};
+
+let notifications = [
+    { id: 1, userId: 'user123', type: 'order_confirmed', title: 'Order Confirmed!',        message: 'Your order #ORD-1021 has been confirmed and is being processed.',       read: false, time: '2 min ago' },
+    { id: 2, userId: 'user123', type: 'order_shipped',   title: 'Order Shipped!',          message: 'Your order #ORD-1022 is on the way. Expected delivery: 3-5 days.',     read: false, time: '15 min ago' },
+    { id: 3, userId: 'user123', type: 'order_delivered', title: 'Order Delivered!',        message: 'Your order #ORD-1020 has been delivered. Enjoy your purchase!',        read: true,  time: '1 hour ago' },
+    { id: 4, userId: 'user123', type: 'order_cancelled', title: 'Order Cancelled',         message: 'Your order #ORD-1019 was cancelled as requested.',                     read: true,  time: '3 hours ago' },
+    { id: 5, userId: 'user123', type: 'general',         title: 'Flash Sale! 20% Off',     message: 'Use code CLOUD20 at checkout for 20% off your next order.',            read: false, time: '1 day ago' },
+];
+
+function renderNotifications() {
+    const list = document.getElementById('notif-list');
+    if (notifications.length === 0) {
+        list.innerHTML = '<div class="card" style="text-align:center;color:var(--muted);padding:2rem;">🔔 No notifications</div>';
+    } else {
+        list.innerHTML = notifications.map(n => {
+            const m = TYPE_META[n.type] || TYPE_META.general;
+            return `
+            <div class="notif-item ${n.read ? '' : 'unread'}">
+                <div class="notif-icon ${m.cls}">${m.icon}</div>
+                <div class="notif-body">
+                    <div class="notif-title">${n.title}</div>
+                    <div class="notif-msg">${n.message}</div>
+                    <div class="notif-time">${n.time}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:.4rem;">
+                    ${!n.read ? `<button class="btn btn-outline btn-sm" onclick="markRead(${n.id})">Read</button>` : ''}
+                    <button class="btn btn-danger btn-sm" onclick="deleteNotif(${n.id})">✕</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+    const unread = notifications.filter(n => !n.read).length;
+    document.getElementById('total-count').textContent  = notifications.length;
+    document.getElementById('unread-count').textContent = unread;
+    document.getElementById('read-count').textContent   = notifications.length - unread;
+    const badge = document.getElementById('badge');
+    badge.textContent = unread || '';
+    badge.style.display = unread ? 'inline' : 'none';
+}
+
+function markRead(id) {
+    notifications = notifications.map(n => n.id === id ? { ...n, read: true } : n);
+    renderNotifications();
+}
+function markAllRead() {
+    notifications = notifications.map(n => ({ ...n, read: true }));
+    renderNotifications();
+}
+function deleteNotif(id) {
+    notifications = notifications.filter(n => n.id !== id);
+    renderNotifications();
+}
+function clearAll() {
+    if (confirm('Clear all notifications?')) { notifications = []; renderNotifications(); }
+}
+
+function sendNotification() {
+    const title = document.getElementById('n-title').value.trim();
+    const msg   = document.getElementById('n-msg').value.trim();
+    const type  = document.getElementById('n-type').value;
+    if (!title || !msg) {
+        document.getElementById('send-msg').innerHTML = '<div class="alert alert-danger">Title and message are required.</div>';
+        return;
+    }
+    notifications.unshift({ id: Date.now(), userId: 'user123', type, title, message: msg, read: false, time: 'Just now' });
+    document.getElementById('send-msg').innerHTML = '<div class="alert alert-success">Notification sent!</div>';
+    document.getElementById('n-title').value = '';
+    document.getElementById('n-msg').value   = '';
+    renderNotifications();
+    setTimeout(() => document.getElementById('send-msg').innerHTML = '', 2000);
+}
+
+renderNotifications();
+</script>
+</body>
+</html>

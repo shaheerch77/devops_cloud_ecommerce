@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopCloud — Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="index.html" class="brand">Shop<span>Cloud</span></a>
+    <ul class="nav-links">
+        <li><a href="index.html" class="active">Dashboard</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="orders.html">Orders</a></li>
+        <li><a href="notifications.html">Notifications</a></li>
+        <li><a href="login.html">Login</a></li>
+    </ul>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <h1>Welcome to ShopCloud</h1>
+    <p>A cloud-native e-commerce platform powered by microservices, Docker &amp; Kubernetes.</p>
+</div>
+
+<div class="container">
+
+    <!-- Stats Row -->
+    <div class="grid-4" style="margin-bottom:2rem;">
+        <div class="stat-card" style="border-left-color:#2563eb;">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-sub">↑ 12% this month</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#16a34a;">
+            <div class="stat-label">Products Listed</div>
+            <div class="stat-value">342</div>
+            <div class="stat-sub">↑ 8 added today</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#d97706;">
+            <div class="stat-label">Active Orders</div>
+            <div class="stat-value">57</div>
+            <div class="stat-sub">↓ 3 from yesterday</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#7c3aed;">
+            <div class="stat-label">Notifications Sent</div>
+            <div class="stat-value">9,801</div>
+            <div class="stat-sub">Last 30 days</div>
+        </div>
+    </div>
+
+    <!-- Services Status + Recent Orders -->
+    <div class="grid-2" style="margin-bottom:2rem;">
+
+        <!-- Microservice Health -->
+        <div class="card">
+            <h2>🔧 Microservice Status</h2>
+            <table>
+                <thead>
+                    <tr><th>Service</th><th>Port</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>User Service</strong></td>
+                        <td>:5000</td>
+                        <td><span class="badge badge-success">● Online</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Product Service</strong></td>
+                        <td>:5001</td>
+                        <td><span class="badge badge-success">● Online</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Order Service</strong></td>
+                        <td>:5002</td>
+                        <td><span class="badge badge-success">● Online</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Notification Service</strong></td>
+                        <td>:5003</td>
+                        <td><span class="badge badge-success">● Online</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>MongoDB</strong></td>
+                        <td>:27017</td>
+                        <td><span class="badge badge-success">● Online</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="card">
+            <h2>🛒 Recent Orders</h2>
+            <table>
+                <thead>
+                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#ORD-1021</td><td>Ali Hassan</td><td>$129.99</td>
+                        <td><span class="badge badge-success">Delivered</span></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD-1022</td><td>Sara Khan</td><td>$74.50</td>
+                        <td><span class="badge badge-info">Shipped</span></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD-1023</td><td>Usman Tariq</td><td>$210.00</td>
+                        <td><span class="badge badge-warning">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD-1024</td><td>Ayesha Raza</td><td>$45.00</td>
+                        <td><span class="badge badge-danger">Cancelled</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:1rem;">
+                <a href="orders.html" class="btn btn-outline btn-sm">View All Orders →</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Pipeline Overview -->
+    <div class="card">
+        <h2>🚀 CI/CD Pipeline Overview</h2>
+        <div class="grid-4">
+            <div style="text-align:center;padding:1rem;">
+                <div style="font-size:2rem;">📦</div>
+                <div style="font-weight:700;margin:.5rem 0;">Checkout</div>
+                <div style="font-size:.85rem;color:var(--muted);">Pull latest code from GitHub</div>
+                <div style="margin-top:.75rem;"><span class="badge badge-success">✓ Passed</span></div>
+            </div>
+            <div style="text-align:center;padding:1rem;">
+                <div style="font-size:2rem;">🧪</div>
+                <div style="font-weight:700;margin:.5rem 0;">Build &amp; Test</div>
+                <div style="font-size:.85rem;color:var(--muted);">npm install &amp; run unit tests</div>
+                <div style="margin-top:.75rem;"><span class="badge badge-success">✓ Passed</span></div>
+            </div>
+            <div style="text-align:center;padding:1rem;">
+                <div style="font-size:2rem;">🐳</div>
+                <div style="font-weight:700;margin:.5rem 0;">Docker Build</div>
+                <div style="font-size:.85rem;color:var(--muted);">Build &amp; push Docker images</div>
+                <div style="margin-top:.75rem;"><span class="badge badge-success">✓ Passed</span></div>
+            </div>
+            <div style="text-align:center;padding:1rem;">
+                <div style="font-size:2rem;">☸️</div>
+                <div style="font-weight:700;margin:.5rem 0;">Deploy</div>
+                <div style="font-size:.85rem;color:var(--muted);">kubectl apply to cluster</div>
+                <div style="margin-top:.75rem;"><span class="badge badge-success">✓ Passed</span></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    &copy; 2024 <strong>ShopCloud</strong> — DevOps Cloud Computing Final Project
+</footer>
+
+</body>
+</html>

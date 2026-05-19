@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopCloud — Orders</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .order-row td { vertical-align: middle; }
+        .items-list { font-size: .82rem; color: var(--muted); }
+        .status-select { padding: .25rem .5rem; border-radius: 5px; border: 1px solid var(--border); font-size: .8rem; cursor: pointer; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: #fff; border-radius: var(--radius); padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+        .modal h3 { margin-bottom: 1.25rem; }
+        .modal-close { float: right; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--muted); margin-top: -.5rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">Shop<span>Cloud</span></a>
+    <ul class="nav-links">
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="orders.html" class="active">Orders</a></li>
+        <li><a href="notifications.html">Notifications</a></li>
+        <li><a href="login.html">Login</a></li>
+    </ul>
+</nav>
+
+<div class="hero" style="padding:2.5rem 2rem;">
+    <h1>Order Management</h1>
+    <p>Track, update, and manage all orders via the Order Service API</p>
+</div>
+
+<div class="container">
+
+    <!-- Stats -->
+    <div class="grid-4" style="margin-bottom:1.75rem;">
+        <div class="stat-card" style="border-left-color:#2563eb;"><div class="stat-label">Total Orders</div><div class="stat-value">57</div></div>
+        <div class="stat-card" style="border-left-color:#d97706;"><div class="stat-label">Pending</div><div class="stat-value">12</div></div>
+        <div class="stat-card" style="border-left-color:#7c3aed;"><div class="stat-label">Shipped</div><div class="stat-value">23</div></div>
+        <div class="stat-card" style="border-left-color:#16a34a;"><div class="stat-label">Delivered</div><div class="stat-value">18</div></div>
+    </div>
+
+    <!-- Place Order Button -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <h2 style="font-size:1.05rem; color:var(--muted);">All Orders</h2>
+        <button class="btn btn-primary" onclick="document.querySelector('.modal-overlay').classList.add('open')">+ Place New Order</button>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card">
+        <div class="table-wrap">
+            <table id="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- API Ref -->
+    <div class="card" style="margin-top:2rem;">
+        <h2>🔗 Order Service API Endpoints</h2>
+        <table>
+            <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><span class="badge badge-success">POST</span></td><td><code>/api/orders</code></td><td>Place new order</td></tr>
+                <tr><td><span class="badge badge-info">GET</span></td><td><code>/api/orders</code></td><td>Get all orders</td></tr>
+                <tr><td><span class="badge badge-info">GET</span></td><td><code>/api/orders/user/:userId</code></td><td>Orders by user</td></tr>
+                <tr><td><span class="badge badge-info">GET</span></td><td><code>/api/orders/:id</code></td><td>Get order detail</td></tr>
+                <tr><td><span class="badge badge-warning">PUT</span></td><td><code>/api/orders/:id/status</code></td><td>Update status</td></tr>
+                <tr><td><span class="badge badge-warning">PUT</span></td><td><code>/api/orders/:id/cancel</code></td><td>Cancel order</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Place Order Modal -->
+<div class="modal-overlay">
+    <div class="modal">
+        <button class="modal-close" onclick="document.querySelector('.modal-overlay').classList.remove('open')">✕</button>
+        <h3>🛒 Place New Order</h3>
+        <div id="order-msg"></div>
+        <div class="form-group"><label>Customer Name</label><input type="text" id="o-name" placeholder="e.g. Ali Hassan" /></div>
+        <div class="form-group"><label>Product</label>
+            <select id="o-product">
+                <option value="Wireless Headphones|79.99">Wireless Headphones — $79.99</option>
+                <option value="Running Shoes|59.99">Running Shoes — $59.99</option>
+                <option value="Smart Watch|149.99">Smart Watch — $149.99</option>
+                <option value="Coffee Maker|44.99">Coffee Maker — $44.99</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Quantity</label><input type="number" id="o-qty" value="1" min="1" /></div>
+        <div class="form-group"><label>Shipping Address</label><input type="text" id="o-addr" placeholder="e.g. 123 Main St, Lahore" /></div>
+        <div style="display:flex; gap:.75rem; margin-top:.5rem;">
+            <button class="btn btn-success" onclick="placeOrder()">Confirm Order</button>
+            <button class="btn btn-outline" onclick="document.querySelector('.modal-overlay').classList.remove('open')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<footer>&copy; 2024 <strong>ShopCloud</strong> — DevOps Cloud Computing Final Project</footer>
+
+<script>
+const statusBadge = { pending:'badge-warning', confirmed:'badge-info', shipped:'badge-info', delivered:'badge-success', cancelled:'badge-danger' };
+
+let orders = [
+    { id:'ORD-1021', customer:'Ali Hassan',   items:'Wireless Headphones x1', total:79.99,  status:'delivered', date:'2024-11-01' },
+    { id:'ORD-1022', customer:'Sara Khan',    items:'Running Shoes x2',        total:119.98, status:'shipped',   date:'2024-11-03' },
+    { id:'ORD-1023', customer:'Usman Tariq',  items:'Smart Watch x1',          total:149.99, status:'pending',   date:'2024-11-05' },
+    { id:'ORD-1024', customer:'Ayesha Raza',  items:'Coffee Maker x1',         total:44.99,  status:'cancelled', date:'2024-11-06' },
+    { id:'ORD-1025', customer:'Bilal Ahmed',  items:'LED Desk Lamp x3',        total:74.97,  status:'confirmed', date:'2024-11-07' },
+];
+
+function renderOrders() {
+    document.getElementById('orders-body').innerHTML = orders.map(o => `
+        <tr class="order-row">
+            <td><strong>${o.id}</strong></td>
+            <td>${o.customer}</td>
+            <td class="items-list">${o.items}</td>
+            <td><strong>$${o.total.toFixed(2)}</strong></td>
+            <td><span class="badge ${statusBadge[o.status]||'badge-muted'}">${o.status}</span></td>
+            <td>${o.date}</td>
+            <td>
+                <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
+                    ${['pending','confirmed','shipped','delivered','cancelled'].map(s =>
+                        `<option value="${s}" ${s===o.status?'selected':''}>${s}</option>`
+                    ).join('')}
+                </select>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function updateStatus(id, newStatus) {
+    orders = orders.map(o => o.id === id ? { ...o, status: newStatus } : o);
+    renderOrders();
+}
+
+function placeOrder() {
+    const name = document.getElementById('o-name').value.trim();
+    const prod = document.getElementById('o-product').value.split('|');
+    const qty  = parseInt(document.getElementById('o-qty').value);
+    if (!name) { document.getElementById('order-msg').innerHTML = '<div class="alert alert-danger">Customer name required.</div>'; return; }
+    const total = (parseFloat(prod[1]) * qty).toFixed(2);
+    const newId = 'ORD-' + (1030 + orders.length);
+    orders.unshift({ id: newId, customer: name, items: `${prod[0]} x${qty}`, total: parseFloat(total), status: 'pending', date: new Date().toISOString().slice(0,10) });
+    document.getElementById('order-msg').innerHTML = `<div class="alert alert-success">Order ${newId} placed! Total: $${total}</div>`;
+    renderOrders();
+    setTimeout(() => document.querySelector('.modal-overlay').classList.remove('open'), 1500);
+}
+
+renderOrders();
+</script>
+</body>
+</html>
