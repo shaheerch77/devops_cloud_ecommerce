@@ -40,11 +40,13 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/notification-service:staging ./src/notification-service
           docker push ${{ secrets.DOCKER_USERNAME }}/notification-service:staging
 
+      - name: Deploy to Render (Staging)
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          echo "✅ Render staging deployment triggered!"
+
       - name: Deployment Summary
         run: |
-          echo "🚀 Staging deployment complete!"
-          echo "Images pushed with :staging tag"
-          echo "User Service:         ${{ secrets.DOCKER_USERNAME }}/user-service:staging"
-          echo "Product Service:      ${{ secrets.DOCKER_USERNAME }}/product-service:staging"
-          echo "Order Service:        ${{ secrets.DOCKER_USERNAME }}/order-service:staging"
-          echo "Notification Service: ${{ secrets.DOCKER_USERNAME }}/notification-service:staging"
+          echo "✅ Staging deployment complete!"
+          echo "Docker images pushed with :staging tag"
+          echo "Live URL: https://shopcloud-q0tw.onrender.com"

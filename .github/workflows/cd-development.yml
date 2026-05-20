@@ -40,11 +40,13 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/notification-service:dev ./src/notification-service
           docker push ${{ secrets.DOCKER_USERNAME }}/notification-service:dev
 
+      - name: Deploy to Render (Development)
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          echo "✅ Render development deployment triggered!"
+
       - name: Deployment Summary
         run: |
-          echo "🚀 Development deployment complete!"
-          echo "Images pushed with :dev tag"
-          echo "User Service:         ${{ secrets.DOCKER_USERNAME }}/user-service:dev"
-          echo "Product Service:      ${{ secrets.DOCKER_USERNAME }}/product-service:dev"
-          echo "Order Service:        ${{ secrets.DOCKER_USERNAME }}/order-service:dev"
-          echo "Notification Service: ${{ secrets.DOCKER_USERNAME }}/notification-service:dev"
+          echo "✅ Development deployment complete!"
+          echo "Docker images pushed with :dev tag"
+          echo "Live URL: https://shopcloud-development-9eon.onrender.com"

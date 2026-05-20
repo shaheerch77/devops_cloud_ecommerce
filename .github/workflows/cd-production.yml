@@ -40,6 +40,11 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/notification-service:latest ./src/notification-service
           docker push ${{ secrets.DOCKER_USERNAME }}/notification-service:latest
 
+      - name: Deploy to Render (Production)
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          echo "✅ Render production deployment triggered!"
+
       - name: Rollback on Failure
         if: failure()
         run: |
@@ -50,8 +55,5 @@ jobs:
       - name: Deployment Summary
         run: |
           echo "✅ Production deployment complete!"
-          echo "Images pushed with :latest tag"
-          echo "User Service:         ${{ secrets.DOCKER_USERNAME }}/user-service:latest"
-          echo "Product Service:      ${{ secrets.DOCKER_USERNAME }}/product-service:latest"
-          echo "Order Service:        ${{ secrets.DOCKER_USERNAME }}/order-service:latest"
-          echo "Notification Service: ${{ secrets.DOCKER_USERNAME }}/notification-service:latest"
+          echo "Docker images pushed with :latest tag"
+          echo "Live URL: https://devops-cloud-ecommerce.onrender.com"
